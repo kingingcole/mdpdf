@@ -1,18 +1,18 @@
 import { copyFileSync, unlinkSync } from 'fs';
 import { readFile, writeFile } from 'fs/promises';
-import { join, dirname, resolve, parse as parsePath } from 'path';
-import { fileURLToPath } from 'url';
+import handlebars from 'handlebars';
+import { allowUnsafeNewFunction } from 'loophole';
+import { dirname, join, parse as parsePath, resolve } from 'path';
+import { Browser, launch } from 'puppeteer';
 import showdown from 'showdown';
-const { setFlavor, Converter } = showdown;
 import showdownEmoji from 'showdown-emoji';
 import showdownHighlight from 'showdown-highlight';
-import { launch, Browser } from 'puppeteer';
-import handlebars from 'handlebars';
-const { SafeString, compile } = handlebars;
-import { allowUnsafeNewFunction } from 'loophole';
-import { getStyles, getStyleBlock, qualifyImgSources } from './utils.js';
+import { fileURLToPath } from 'url';
 import { getOptions } from './puppeteer-helper.js';
 import { MdPdfOptions } from './types.js';
+import { getStyleBlock, getStyles, qualifyImgSources } from './utils.js';
+const { setFlavor, Converter } = showdown;
+const { SafeString, compile } = handlebars;
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = dirname(__filename);
@@ -31,16 +31,16 @@ function getAllStyles(options: MdPdfOptions): MdPdfStyles {
   let cssStyleSheets: string[] = [];
 
   // GitHub Markdown Style
-  if (options.ghStyle) {
-    cssStyleSheets.push(join(__dirname, '/assets/github-markdown-css.css'));
-  }
-  // Highlight CSS
-  cssStyleSheets.push(join(__dirname, '/assets/highlight/styles/github.css'));
+  // if (options.ghStyle) {
+  //   cssStyleSheets.push(join(__dirname, '/assets/github-markdown-css.css'));
+  // }
+  // // Highlight CSS
+  // cssStyleSheets.push(join(__dirname, '/assets/highlight/styles/github.css'));
 
-  // Some additional defaults such as margins
-  if (options.defaultStyle) {
-    cssStyleSheets.push(join(__dirname, '/assets/default.css'));
-  }
+  // // Some additional defaults such as margins
+  // if (options.defaultStyle) {
+  //   cssStyleSheets.push(join(__dirname, '/assets/default.css'));
+  // }
 
   // Optional user given CSS
   if (options.styles) {
@@ -125,13 +125,17 @@ export async function convert(
   const headerPromise = prepareHeader(fullOptions, styles.styles);
   const footerPromise = prepareFooter(fullOptions);
 
-  const [layoutTemplate, sourceMarkdown, headerHtml, footerHtml] =
-    await Promise.all([
-      layoutPromise,
-      sourcePromise,
-      headerPromise,
-      footerPromise,
-    ]);
+  const [
+    layoutTemplate,
+    sourceMarkdown,
+    headerHtml,
+    footerHtml,
+  ] = await Promise.all([
+    layoutPromise,
+    sourcePromise,
+    headerPromise,
+    footerPromise,
+  ]);
 
   fullOptions.header = headerHtml;
   fullOptions.footer = footerHtml;
