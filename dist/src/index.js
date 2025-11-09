@@ -17,10 +17,6 @@ let __filenameSplit = __filename.split('/node_modules');
 __filenameSplit[0] = process.cwd();
 __filename = __filenameSplit.join('/node_modules');
 const __dirname = dirname(__filename);
-// Main layout template
-const layoutPath = join(__dirname, '/layouts/doc-body.hbs');
-const headerLayoutPath = join(__dirname, '/layouts/header.hbs');
-const footerLayoutPath = join(__dirname, '/layouts/footer.hbs');
 function getAllStyles(options) {
     let cssStyleSheets = [];
     console.log({ __filename, __dirname, cwd: process.cwd() });
@@ -91,7 +87,7 @@ export async function convert(options) {
         css: css,
     };
     // Asynchronously read files and prepare components
-    const layoutPromise = readFile(layoutPath, 'utf8').then(compile);
+    const layoutPromise = readFile(options.layoutPath, 'utf8').then(compile);
     const sourcePromise = readFile(fullOptions.source, 'utf8');
     const headerPromise = prepareHeader(fullOptions, styles.styles);
     const footerPromise = prepareFooter(fullOptions);
@@ -117,6 +113,7 @@ async function prepareHeader(options, css) {
     if (!options.header) {
         return undefined; // Return early if no header
     }
+    const headerLayoutPath = join(__dirname, '/layouts/header.hbs');
     // Get the hbs layout
     const headerLayoutContent = await readFile(headerLayoutPath, 'utf8');
     const headerTemplate = compile(headerLayoutContent);
