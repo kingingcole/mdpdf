@@ -7,17 +7,23 @@ import { launch } from 'puppeteer';
 import showdown from 'showdown';
 import showdownEmoji from 'showdown-emoji';
 import showdownHighlight from 'showdown-highlight';
+import { fileURLToPath } from 'url';
 import { getOptions } from './puppeteer-helper.js';
 import { getStyleBlock, getStyles, qualifyImgSources } from './utils.js';
 const { setFlavor, Converter } = showdown;
 const { SafeString, compile } = handlebars;
+let __filename = fileURLToPath(import.meta.url);
+let __filenameSplit = __filename.split('/node_modules');
+__filenameSplit[0] = process.cwd();
+__filename = __filenameSplit.join('/node_modules');
+const __dirname = dirname(__filename);
 // Main layout template
 const layoutPath = join(__dirname, '/layouts/doc-body.hbs');
 const headerLayoutPath = join(__dirname, '/layouts/header.hbs');
 const footerLayoutPath = join(__dirname, '/layouts/footer.hbs');
 function getAllStyles(options) {
     let cssStyleSheets = [];
-    console.log(import.meta.url, __filename, __dirname);
+    console.log({ __filename, __dirname, cwd: process.cwd() });
     // GitHub Markdown Style
     if (options.ghStyle) {
         cssStyleSheets.push(join(__dirname, '/assets/github-markdown-css.css'));
