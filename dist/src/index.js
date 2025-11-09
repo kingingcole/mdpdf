@@ -19,17 +19,16 @@ __filename = __filenameSplit.join('/node_modules');
 const __dirname = dirname(__filename);
 function getAllStyles(options) {
     let cssStyleSheets = [];
-    console.log({ __filename, __dirname, cwd: process.cwd() });
     // GitHub Markdown Style
-    if (options.ghStyle) {
-        cssStyleSheets.push(join(__dirname, '/assets/github-markdown-css.css'));
-    }
-    // Highlight CSS
-    cssStyleSheets.push(join(__dirname, '/assets/highlight/styles/github.css'));
-    // Some additional defaults such as margins
-    if (options.defaultStyle) {
-        cssStyleSheets.push(join(__dirname, '/assets/default.css'));
-    }
+    // if (options.ghStyle) {
+    //   cssStyleSheets.push(join(__dirname, '/assets/github-markdown-css.css'));
+    // }
+    // // Highlight CSS
+    // cssStyleSheets.push(join(__dirname, '/assets/highlight/styles/github.css'));
+    // // Some additional defaults such as margins
+    // if (options.defaultStyle) {
+    //   cssStyleSheets.push(join(__dirname, '/assets/default.css'));
+    // }
     // Optional user given CSS
     if (options.styles) {
         cssStyleSheets = cssStyleSheets.concat(options.styles);

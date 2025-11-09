@@ -28,19 +28,18 @@ interface MdPdfStyles {
 
 function getAllStyles(options: MdPdfOptions): MdPdfStyles {
   let cssStyleSheets: string[] = [];
-  console.log({ __filename, __dirname, cwd: process.cwd() });
 
   // GitHub Markdown Style
-  if (options.ghStyle) {
-    cssStyleSheets.push(join(__dirname, '/assets/github-markdown-css.css'));
-  }
-  // Highlight CSS
-  cssStyleSheets.push(join(__dirname, '/assets/highlight/styles/github.css'));
+  // if (options.ghStyle) {
+  //   cssStyleSheets.push(join(__dirname, '/assets/github-markdown-css.css'));
+  // }
+  // // Highlight CSS
+  // cssStyleSheets.push(join(__dirname, '/assets/highlight/styles/github.css'));
 
-  // Some additional defaults such as margins
-  if (options.defaultStyle) {
-    cssStyleSheets.push(join(__dirname, '/assets/default.css'));
-  }
+  // // Some additional defaults such as margins
+  // if (options.defaultStyle) {
+  //   cssStyleSheets.push(join(__dirname, '/assets/default.css'));
+  // }
 
   // Optional user given CSS
   if (options.styles) {
