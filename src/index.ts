@@ -7,15 +7,11 @@ import { Browser, launch } from 'puppeteer';
 import showdown from 'showdown';
 import showdownEmoji from 'showdown-emoji';
 import showdownHighlight from 'showdown-highlight';
-import { fileURLToPath } from 'url';
 import { getOptions } from './puppeteer-helper.js';
 import { MdPdfOptions } from './types.js';
 import { getStyleBlock, getStyles, qualifyImgSources } from './utils.js';
 const { setFlavor, Converter } = showdown;
 const { SafeString, compile } = handlebars;
-
-const __filename = fileURLToPath(import.meta.url);
-const __dirname = dirname(__filename);
 
 // Main layout template
 const layoutPath = join(__dirname, '/layouts/doc-body.hbs');
@@ -30,17 +26,19 @@ interface MdPdfStyles {
 function getAllStyles(options: MdPdfOptions): MdPdfStyles {
   let cssStyleSheets: string[] = [];
 
-  // GitHub Markdown Style
-  // if (options.ghStyle) {
-  //   cssStyleSheets.push(join(__dirname, '/assets/github-markdown-css.css'));
-  // }
-  // // Highlight CSS
-  // cssStyleSheets.push(join(__dirname, '/assets/highlight/styles/github.css'));
+  console.log(import.meta.url, __filename, __dirname);
 
-  // // Some additional defaults such as margins
-  // if (options.defaultStyle) {
-  //   cssStyleSheets.push(join(__dirname, '/assets/default.css'));
-  // }
+  // GitHub Markdown Style
+  if (options.ghStyle) {
+    cssStyleSheets.push(join(__dirname, '/assets/github-markdown-css.css'));
+  }
+  // Highlight CSS
+  cssStyleSheets.push(join(__dirname, '/assets/highlight/styles/github.css'));
+
+  // Some additional defaults such as margins
+  if (options.defaultStyle) {
+    cssStyleSheets.push(join(__dirname, '/assets/default.css'));
+  }
 
   // Optional user given CSS
   if (options.styles) {
