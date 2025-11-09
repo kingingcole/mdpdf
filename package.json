@@ -11,9 +11,7 @@
     "lint-fix": "prettier --trailing-comma es5 --single-quote --list-different '{src,tests,bin}/**/*.{ts,js}' --write",
     "test": "npm run build && vitest run",
     "test:watch": "npm run build && vitest",
-    "dev": "tsc --watch",
-    "prepublishOnly": "npm run build",
-    "postinstall": "npm run build"
+    "dev": "tsc --watch"
   },
   "bin": {
     "mdpdf": "dist/bin/index.js"
