@@ -12,8 +12,7 @@
     "test": "npm run build && vitest run",
     "test:watch": "npm run build && vitest",
     "dev": "tsc --watch",
-    "prepublishOnly": "npm run build",
-    "postinstall": "npx puppeteer browsers install chrome"
+    "prepublishOnly": "npm run build"
   },
   "bin": {
     "mdpdf": "dist/bin/index.js"

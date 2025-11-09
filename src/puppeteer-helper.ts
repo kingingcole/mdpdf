@@ -1,4 +1,4 @@
-import { PDFOptions } from 'puppeteer';
+import { PDFOptions } from 'puppeteer-core';
 import { MdPdfOptions } from './types.js';
 
 export function getOptions(options: MdPdfOptions): PDFOptions {

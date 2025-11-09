@@ -1,9 +1,10 @@
+import chromium from '@sparticuz/chromium';
 import { copyFileSync, unlinkSync } from 'fs';
 import { readFile, writeFile } from 'fs/promises';
 import handlebars from 'handlebars';
 import { allowUnsafeNewFunction } from 'loophole';
 import { dirname, join, parse as parsePath, resolve } from 'path';
-import { launch } from 'puppeteer';
+import { launch } from 'puppeteer-core';
 import showdown from 'showdown';
 import showdownEmoji from 'showdown-emoji';
 import showdownHighlight from 'showdown-highlight';
@@ -144,7 +145,13 @@ async function createPdf(html, options) {
         await writeFile(tempHtmlPath, html);
         browser = await launch({
             headless: true, // Use boolean instead of 'new' string
-            args: ['--no-sandbox', '--disable-setuid-sandbox'],
+            args: [
+                ...chromium.args,
+                '--no-sandbox',
+                '--disable-setuid-sandbox',
+                '--disable-web-security',
+            ],
+            executablePath: await chromium.executablePath(),
         });
         const page = (await browser.pages())[0];
         await page.goto('file:' + tempHtmlPath, {
