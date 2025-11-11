@@ -12,7 +12,8 @@
     "test": "npm run build && vitest run",
     "test:watch": "npm run build && vitest",
     "dev": "tsc --watch",
-    "prepublishOnly": "npm run build"
+    "prepublishOnly": "npm run build",
+    "postinstall": "node scripts/postinstall.mjs"
   },
   "bin": {
     "mdpdf": "dist/bin/index.js"
@@ -44,7 +45,7 @@
   },
   "homepage": "https://github.com/elliotblackburn/mdpdf#readme",
   "dependencies": {
-    "@sparticuz/chromium": "^141.0.0",
+    "@sparticuz/chromium-min": "^141.0.0",
     "cheerio": "1.0.0-rc.12",
     "file-url": "^4.0.0",
     "handlebars": "^4.7.8",
@@ -56,6 +57,7 @@
     "showdown-highlight": "^3.1.0"
   },
   "devDependencies": {
+    "@sparticuz/chromium": "^141.0.0",
     "@types/chai": "^5.2.1",
     "@types/handlebars": "^4.0.40",
     "@types/node": "^24.3.0",
@@ -63,6 +65,7 @@
     "chai": "^5.2.0",
     "execa": "^9.5.2",
     "prettier": "^3.1.1",
+    "puppeteer": "^23.11.0",
     "ts-node": "^10.9.2",
     "typescript": "^5.8.3",
     "vitest": "^3.1.2"

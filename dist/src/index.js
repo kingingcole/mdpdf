@@ -1,10 +1,8 @@
-import chromium from '@sparticuz/chromium';
 import { copyFileSync, unlinkSync } from 'fs';
 import { readFile, writeFile } from 'fs/promises';
 import handlebars from 'handlebars';
 import { allowUnsafeNewFunction } from 'loophole';
 import { dirname, join, parse as parsePath, resolve } from 'path';
-import { launch } from 'puppeteer-core';
 import showdown from 'showdown';
 import showdownEmoji from 'showdown-emoji';
 import showdownHighlight from 'showdown-highlight';
@@ -18,6 +16,42 @@ let __filenameSplit = __filename.split('/node_modules');
 __filenameSplit[0] = process.cwd();
 __filename = __filenameSplit.join('/node_modules');
 const __dirname = dirname(__filename);
+/* eslint-disable @typescript-eslint/no-explicit-any */
+// URL to the Chromium binary package hosted in /public, if not in production, use a fallback URL
+// alternatively, you can host the chromium-pack.tar file elsewhere and update the URL below
+const CHROMIUM_PACK_URL = process.env.VERCEL_PROJECT_PRODUCTION_URL
+    ? `https://${process.env.VERCEL_PROJECT_PRODUCTION_URL}/chromium-pack.tar`
+    : 'https://github.com/gabenunez/puppeteer-on-vercel/raw/refs/heads/main/example/chromium-dont-use-in-prod.tar';
+// Cache the Chromium executable path to avoid re-downloading on subsequent requests
+let cachedExecutablePath = null;
+let downloadPromise = null;
+/**
+ * Downloads and caches the Chromium executable path.
+ * Uses a download promise to prevent concurrent downloads.
+ */
+async function getChromiumPath() {
+    // Return cached path if available
+    console.log({ cachedExecutablePath });
+    if (cachedExecutablePath)
+        return cachedExecutablePath;
+    // Prevent concurrent downloads by reusing the same promise
+    if (!downloadPromise) {
+        const chromium = (await import('@sparticuz/chromium-min')).default;
+        downloadPromise = chromium
+            .executablePath(CHROMIUM_PACK_URL)
+            .then((path) => {
+            cachedExecutablePath = path;
+            console.log('Chromium path resolved:', path);
+            return path;
+        })
+            .catch((error) => {
+            console.error('Failed to get Chromium path:', error);
+            downloadPromise = null; // Reset on error to allow retry
+            throw error;
+        });
+    }
+    return downloadPromise;
+}
 function getAllStyles(options) {
     let cssStyleSheets = [];
     // GitHub Markdown Style
@@ -140,19 +174,31 @@ function prepareFooter(options) {
 }
 async function createPdf(html, options) {
     const tempHtmlPath = resolve(dirname(options.destination), '_temp.html');
-    let browser = null; // Initialize browser to null
+    let browser; // Initialize browser to null
     try {
         await writeFile(tempHtmlPath, html);
-        browser = await launch({
-            headless: true, // Use boolean instead of 'new' string
-            args: [
-                ...chromium.args,
-                '--no-sandbox',
-                '--disable-setuid-sandbox',
-                '--disable-web-security',
-            ],
-            executablePath: await chromium.executablePath(),
-        });
+        const isVercel = !!process.env.VERCEL_ENV;
+        let puppeteer, launchOptions = {
+            headless: true,
+        };
+        console.log({ isVercel, tempHtmlPath });
+        if (isVercel) {
+            // Vercel: Use puppeteer-core with downloaded Chromium binary
+            const chromium = (await import('@sparticuz/chromium-min')).default;
+            puppeteer = await import('puppeteer-core');
+            const executablePath = await getChromiumPath();
+            launchOptions = {
+                ...launchOptions,
+                args: chromium.args,
+                executablePath,
+            };
+            console.log('Launching browser with executable path:', executablePath);
+        }
+        else {
+            // Local: Use regular puppeteer with bundled Chromium
+            puppeteer = await import('puppeteer');
+        }
+        browser = await puppeteer.launch(launchOptions);
         const page = (await browser.pages())[0];
         await page.goto('file:' + tempHtmlPath, {
             waitUntil: options.waitUntil ?? 'networkidle0',
